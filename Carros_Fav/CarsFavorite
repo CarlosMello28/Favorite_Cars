@@ -1,0 +1,84 @@
+# -----------------------------------------------------------
+#  TRABALHO – MATEMÁTICA DISCRETA  
+#  Dataset, grafos e matrizes de análise
+#  Autor(es): <George, Matheus, Gabriel, Leonardo, Carlos>
+# -----------------------------------------------------------
+
+
+dados <- data.frame(
+  Pessoa = c(
+    "Lucas","Ana","Gustavo","Mariana","Renato","Beatriz","Thiago","Camila",
+    "Eduardo","Carolina","Pedro","Helena","Rafael","Sofia","Vinícius",
+    "Julia","Daniel","Isabela","André","Lorena"
+  ),
+  Marcas = c(
+    "Ferrari, Porsche",
+    "Lamborghini, Bugatti",
+    "BMW, Audi",
+    "Mercedes-Benz, Jaguar",
+    "Porsche, McLaren, Aston Martin",
+    "Audi",
+    "McLaren, Ferrari",
+    "Jaguar, Volvo",
+    "Maserati, Lamborghini",
+    "Volvo, Toyota",
+    "Aston Martin, Cadillac",
+    "Bugatti, Ferrari, McLaren",
+    "Chevrolet, Ford",
+    "Toyota, Honda",
+    "Nissan, Toyota",
+    "Honda, BMW",
+    "Land Rover, Mercedes-Benz",
+    "Cadillac, Dodge",
+    "Dodge, Chevrolet",
+    "Ford, Volkswagen"
+  ),
+  stringsAsFactors = FALSE
+)
+
+
+needed <- c("tidyr", "igraph")
+to_install <- needed[!(needed %in% installed.packages()[, "Package"])]
+
+if (length(to_install) > 0) {
+  install.packages(to_install)
+}
+
+library(tidyr)
+library(igraph)
+
+
+edges <- dados |>
+  separate_rows(Marcas, sep = ", ")
+
+colnames(edges)[2] <- "Marca"
+
+
+edges$tipo_pessoa <- "Pessoa"
+
+
+g <- graph_from_data_frame(edges, directed = FALSE)
+
+
+V(g)$tipo <- ifelse(V(g)$name %in% dados$Pessoa, "Pessoa", "Marca")
+
+
+set.seed(123)
+layout_longo <- layout_with_fr(
+  g,
+  niter = 20000,   
+  grid = "nogrid"
+)
+
+
+plot(
+  g,
+  layout = layout_longo,
+  vertex.size = 20,
+  vertex.color = ifelse(V(g)$tipo == "Pessoa", "#87CEFA", "#FFA07A"),
+  vertex.label.color = "black",
+  vertex.label.cex = 1,
+  vertex.frame.color = "black",
+  edge.color = "gray50",
+  main = "Grafo de Incidência – Alunos x Marcas"
+)
